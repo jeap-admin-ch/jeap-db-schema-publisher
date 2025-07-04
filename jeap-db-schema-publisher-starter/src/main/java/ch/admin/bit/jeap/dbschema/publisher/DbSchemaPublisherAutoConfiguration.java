@@ -30,7 +30,9 @@ import java.util.concurrent.Executor;
  * <pre>jeap.archrepo.url</pre> to the URL of the archrepo service.
  * This autoconfiguration is can be completely disabled (for example in tests) by setting the property <pre>jeap.archrepo.enabled=false</pre>.
  */
-@AutoConfiguration(after = DataSourceAutoConfiguration.class)
+@AutoConfiguration(
+        after = DataSourceAutoConfiguration.class,
+        afterName = "ch.admin.bit.jeap.postgresql.aws.config.JeapPostgreSQLAWSDataSourceAutoConfig")
 @EnableConfigurationProperties(ArchRepoProperties.class)
 @ConditionalOnProperty(prefix = ArchRepoProperties.PREFIX, name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableAsync
