@@ -3,11 +3,16 @@
 jEAP DB Schema Publisher is a library based on Spring Boot to publish the DB schema of a jEAP application to the
 jEAP Architecture Repository Service.
 
- * If activated by providing a valid `jeap.architecture.repository.url` property, it will
+* If activated by providing a valid `jeap.archrepo.url` property, it will
    automatically publish the DB schema to the jEAP Architecture Repository Service.
- * The DB schema will be determined and published at application startup, on a best-effort basis. The DB schema upload
+* The request to the Archrepo service will be authenticated using OAuth2. By default, an oauth client registration named
+  `archrepo-client` is expected to be configured under `spring.security.oauth2.client.registration`.
+* The DB schema will be read and published at application startup, on a best-effort basis. The DB schema upload
    process is designed to have the least possible impact on application, i.e. it will not block the application or
    cause startup to fail if the upload fails.
+
+See [ArchRepoProperties](./src/main/java/ch/admin/jeap/archrepo/ArchRepoProperties.java) for a reference of all the
+available configuration properties.
 
 ## Changes
 

@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: test-app
+  datasource:
+    # Testcontainers will override these with @ServiceConnection
+    # The properties need  to be
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: testuser
+    password: testpass
+    driver-class-name: org.postgresql.Driver
+  
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    default-schema: data
+    create-schemas: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          archrepo-client:
+            client-id: archrepo-client
+            client-secret: secret
+            scope: openid
+            authorization-grant-type: client_credentials
+            provider: archrepo-client
+        provider:
+          archrepo-client:
+            token-uri: http://localhost:${wiremock.port}/oauth/token
+  main:
+    banner-mode: off
+
+
+debug: true
