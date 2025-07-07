@@ -3,10 +3,13 @@ package ch.admin.bit.jeap.dbschema.publisher;
 import ch.admin.bit.jeap.dbschema.DbSchemaPublisherTestApplication;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -29,10 +32,14 @@ import static org.awaitility.Awaitility.await;
 @SpringBootTest(classes = DbSchemaPublisherTestApplication.class)
 @Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureObservability // To test the timed annotation on the publisher method
 class SchemaUploadIntegrationTest {
 
     @Autowired
     private DbSchemaPublisherEventListener dbSchemaPublisherEventListener;
+
+    @Autowired
+    private MeterRegistry meterRegistry;
 
     @MockitoSpyBean(name = DbSchemaPublisher.DB_SCHEMA_PUBLISHER_TASK_EXECUTOR)
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
@@ -127,6 +134,12 @@ class SchemaUploadIntegrationTest {
         // Verify that the task was indeed executed asynchronously
         Mockito.verify(threadPoolTaskExecutor, Mockito.times(1))
                 .execute(Mockito.any(Runnable.class));
+
+        Timer timer = (Timer) meterRegistry.getMeters().stream().filter(t -> t.getId().getName().contains("jeap-publish-database-schema"))
+                .toList().getFirst();
+        assertThat(timer.count())
+                .withFailMessage("Expected timer for jeap-publish-database-schema to be recorded")
+                .isOne();
     }
 
     private static void mockOAuthTokenResponse() {
