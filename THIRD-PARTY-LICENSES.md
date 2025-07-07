@@ -28,7 +28,17 @@ Apache License Version 2.0
  * JSON library from Android SDK - [com.vaadin.external.google:android-json](http://developer.android.com/sdk)
  * HikariCP - [com.zaxxer:HikariCP](https://github.com/brettwooldridge/HikariCP)
  * micrometer-commons - [io.micrometer:micrometer-commons](https://github.com/micrometer-metrics/micrometer)
+ * micrometer-core - [io.micrometer:micrometer-core](https://github.com/micrometer-metrics/micrometer)
+ * micrometer-jakarta9 - [io.micrometer:micrometer-jakarta9](https://github.com/micrometer-metrics/micrometer)
  * micrometer-observation - [io.micrometer:micrometer-observation](https://github.com/micrometer-metrics/micrometer)
+ * micrometer-registry-prometheus - [io.micrometer:micrometer-registry-prometheus](https://github.com/micrometer-metrics/micrometer)
+ * Prometheus Metrics Config - [io.prometheus:prometheus-metrics-config](http://github.com/prometheus/client_java/client_java/prometheus-metrics-config)
+ * Prometheus Metrics Core - [io.prometheus:prometheus-metrics-core](http://github.com/prometheus/client_java/client_java/prometheus-metrics-core)
+ * Prometheus Metrics Exposition Formats - [io.prometheus:prometheus-metrics-exposition-formats](http://github.com/prometheus/client_java/client_java/prometheus-metrics-exposition-formats)
+ * Prometheus Metrics Exposition Formats no protobuf - [io.prometheus:prometheus-metrics-exposition-formats-no-protobuf](http://github.com/prometheus/client_java/client_java/prometheus-metrics-exposition-formats-no-protobuf)
+ * Prometheus Metrics Exposition Text Formats - [io.prometheus:prometheus-metrics-exposition-textformats](http://github.com/prometheus/client_java/client_java/prometheus-metrics-exposition-textformats)
+ * Prometheus Metrics Model - [io.prometheus:prometheus-metrics-model](http://github.com/prometheus/client_java/client_java/prometheus-metrics-model)
+ * Prometheus Metrics Tracer Common - [io.prometheus:prometheus-metrics-tracer-common](http://github.com/prometheus/client_java/client_java/prometheus-metrics-tracer/prometheus-metrics-tracer-common)
  * Byte Buddy (without dependencies) - [net.bytebuddy:byte-buddy](https://bytebuddy.net/byte-buddy)
  * Byte Buddy agent - [net.bytebuddy:byte-buddy-agent](https://bytebuddy.net/byte-buddy-agent)
  * Java Native Access - [net.java.dev.jna:jna](https://github.com/java-native-access/jna)
@@ -61,9 +71,12 @@ Apache License Version 2.0
  * Spring Web - [org.springframework:spring-web](https://github.com/spring-projects/spring-framework)
  * Spring Web MVC - [org.springframework:spring-webmvc](https://github.com/spring-projects/spring-framework)
  * spring-boot - [org.springframework.boot:spring-boot](https://spring.io/projects/spring-boot)
+ * spring-boot-actuator - [org.springframework.boot:spring-boot-actuator](https://spring.io/projects/spring-boot)
+ * spring-boot-actuator-autoconfigure - [org.springframework.boot:spring-boot-actuator-autoconfigure](https://spring.io/projects/spring-boot)
  * spring-boot-autoconfigure - [org.springframework.boot:spring-boot-autoconfigure](https://spring.io/projects/spring-boot)
  * spring-boot-configuration-processor - [org.springframework.boot:spring-boot-configuration-processor](https://spring.io/projects/spring-boot)
  * spring-boot-starter - [org.springframework.boot:spring-boot-starter](https://spring.io/projects/spring-boot)
+ * spring-boot-starter-actuator - [org.springframework.boot:spring-boot-starter-actuator](https://spring.io/projects/spring-boot)
  * spring-boot-starter-jdbc - [org.springframework.boot:spring-boot-starter-jdbc](https://spring.io/projects/spring-boot)
  * spring-boot-starter-json - [org.springframework.boot:spring-boot-starter-json](https://spring.io/projects/spring-boot)
  * spring-boot-starter-logging - [org.springframework.boot:spring-boot-starter-logging](https://spring.io/projects/spring-boot)
@@ -88,11 +101,13 @@ Apache License Version 2.0
 BSD 2-Clause License
 -------------------------------
 
+ * HdrHistogram - [org.hdrhistogram:HdrHistogram](http://hdrhistogram.github.io/HdrHistogram/)
  * PostgreSQL JDBC Driver - [org.postgresql:postgresql](https://jdbc.postgresql.org)
 
 BSD License 3
 -------------------------------
 
+ * Protocol Buffers [Core] - [com.google.protobuf:protobuf-java](https://developers.google.com/protocol-buffers/protobuf-java/)
  * Hamcrest - [org.hamcrest:hamcrest](http://hamcrest.org/JavaHamcrest/)
  * Hamcrest Core - [org.hamcrest:hamcrest-core](http://hamcrest.org/JavaHamcrest/)
  * asm - [org.ow2.asm:asm](http://asm.ow2.io/)
@@ -107,6 +122,7 @@ Eclipse Public License v2.0
 -------------------------------
 
  * Jakarta Annotations API - [jakarta.annotation:jakarta.annotation-api](https://projects.eclipse.org/projects/ee4j.ca)
+ * AspectJ Weaver - [org.aspectj:aspectjweaver](https://www.eclipse.org/aspectj/)
  * JUnit Jupiter (Aggregator) - [org.junit.jupiter:junit-jupiter](https://junit.org/junit5/)
  * JUnit Jupiter API - [org.junit.jupiter:junit-jupiter-api](https://junit.org/junit5/)
  * JUnit Jupiter Engine - [org.junit.jupiter:junit-jupiter-engine](https://junit.org/junit5/)
@@ -152,3 +168,9 @@ MIT License
  * Testcontainers :: JUnit Jupiter Extension - [org.testcontainers:junit-jupiter](https://java.testcontainers.org)
  * Testcontainers :: JDBC :: PostgreSQL - [org.testcontainers:postgresql](https://java.testcontainers.org)
  * Testcontainers Core - [org.testcontainers:testcontainers](https://java.testcontainers.org)
+
+Public Domain
+-------------------------------
+
+ * HdrHistogram - [org.hdrhistogram:HdrHistogram](http://hdrhistogram.github.io/HdrHistogram/)
+ * LatencyUtils - [org.latencyutils:LatencyUtils](http://latencyutils.github.io/LatencyUtils/)
