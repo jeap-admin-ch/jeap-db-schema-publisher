@@ -23,7 +23,6 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import javax.sql.DataSource;
-import java.util.concurrent.Executor;
 
 /**
  * Enabling the DB schema upload to the architecture repository (archrepo) requires setting the property
@@ -62,7 +61,7 @@ public class DbSchemaPublisherAutoConfiguration {
                         authorizedClientManager(clientRegistrationRepository, clientService),
                         clientRegistration);
 
-        RestClient restClient = builder
+        RestClient restClient = builder.clone()
                 .baseUrl(properties.getUrl())
                 .requestInitializer(initializer)
                 .build();
@@ -95,14 +94,13 @@ public class DbSchemaPublisherAutoConfiguration {
 
     @Bean
     @ConditionalOnBean(DbSchemaPublisher.class)
-    @ConditionalOnProperty(prefix = ArchRepoProperties.PREFIX, name = "on-startup", havingValue = "true", matchIfMissing = true)
     public DbSchemaPublisherEventListener dbSchemaPublisherEventListener(DbSchemaPublisher dbSchemaPublisher) {
         return new DbSchemaPublisherEventListener(dbSchemaPublisher);
     }
 
-    @Bean("dbSchemaPublisherTaskExecutor")
-    @ConditionalOnBean(DbSchemaPublisherEventListener.class)
-    public Executor dbSchemaPublisherTaskExecutor() {
+    @Bean(DbSchemaPublisher.DB_SCHEMA_PUBLISHER_TASK_EXECUTOR)
+    @ConditionalOnBean(DbSchemaPublisher.class)
+    public ThreadPoolTaskExecutor dbSchemaPublisherTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(0);
         executor.setMaxPoolSize(1);
