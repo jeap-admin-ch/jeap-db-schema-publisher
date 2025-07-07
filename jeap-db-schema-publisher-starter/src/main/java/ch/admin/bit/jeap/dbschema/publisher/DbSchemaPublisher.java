@@ -4,6 +4,7 @@ import ch.admin.bit.jeap.dbschema.archrepo.client.ArchitectureRepositoryService;
 import ch.admin.bit.jeap.dbschema.archrepo.client.CreateOrUpdateDbSchemaDto;
 import ch.admin.bit.jeap.dbschema.model.DatabaseSchema;
 import ch.admin.bit.jeap.dbschema.reader.DatabaseModelReader;
+import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
@@ -42,6 +43,7 @@ class DbSchemaPublisher {
     }
 
     @Async(DB_SCHEMA_PUBLISHER_TASK_EXECUTOR)
+    @Timed(value = "jeap-publish-database-schema")
     public CompletableFuture<Void> publishDatabaseSchemaAsync() {
         try {
             publishDatabaseSchema();
