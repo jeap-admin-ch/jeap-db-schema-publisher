@@ -7,12 +7,16 @@ import ch.admin.bit.jeap.dbschema.reader.DatabaseModelReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
+import org.springframework.scheduling.annotation.Async;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 class DbSchemaPublisher {
+
+    static final String DB_SCHEMA_PUBLISHER_TASK_EXECUTOR = "dbSchemaPublisherTaskExecutor";
 
     private final String applicationName;
     private final ArchRepoProperties properties;
@@ -35,6 +39,21 @@ class DbSchemaPublisher {
         this.databaseModelReader = databaseModelReader;
         this.buildProperties = buildProperties;
         this.gitProperties = gitProperties;
+    }
+
+    @Async(DB_SCHEMA_PUBLISHER_TASK_EXECUTOR)
+    public CompletableFuture<Void> publishDatabaseSchemaAsync() {
+        try {
+            publishDatabaseSchema();
+            return CompletableFuture.completedFuture(null);
+
+        } catch (SQLException e) {
+            log.error("Failed to read database schema", e);
+            return CompletableFuture.failedFuture(e);
+        } catch (Exception e) {
+            log.error("Failed to publish database schema", e);
+            return CompletableFuture.failedFuture(e);
+        }
     }
 
     void publishDatabaseSchema() throws SQLException {

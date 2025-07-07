@@ -39,10 +39,9 @@ class DbSchemaPublisherVersionTest {
                 .thenReturn(expectedModel);
 
         DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, null);
-        DbSchemaPublisherEventListener publisherScheduler = new DbSchemaPublisherEventListener(publisher);
 
         // When
-        publisherScheduler.publishSchemaAsync().join();
+        publisher.publishDatabaseSchemaAsync().join();
 
         // Then - verify that the version from BuildProperties was used
         verify(databaseModelReader)
@@ -64,10 +63,9 @@ class DbSchemaPublisherVersionTest {
                 .thenReturn(expectedModel);
 
         DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, null, null);
-        DbSchemaPublisherEventListener publisherScheduler = new DbSchemaPublisherEventListener(publisher);
 
         // When
-        publisherScheduler.publishSchemaAsync().join();
+        publisher.publishDatabaseSchemaAsync().join();
 
         // Then - verify that the fallback version "na" was used
         verify(databaseModelReader)
@@ -102,10 +100,9 @@ class DbSchemaPublisherVersionTest {
                 .thenReturn(mockModel);
 
         DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, null);
-        DbSchemaPublisherEventListener publisherScheduler = new DbSchemaPublisherEventListener(publisher);
 
         // When
-        publisherScheduler.publishSchemaAsync().join();
+        publisher.publishDatabaseSchemaAsync().join();
 
         // Then - verify the version was correctly passed to the database model reader
         verify(databaseModelReader)
@@ -133,10 +130,9 @@ class DbSchemaPublisherVersionTest {
                 .thenReturn(expectedModel);
 
         DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, null, gitProperties);
-        DbSchemaPublisherEventListener publisherScheduler = new DbSchemaPublisherEventListener(publisher);
 
         // When
-        publisherScheduler.publishSchemaAsync().join();
+        publisher.publishDatabaseSchemaAsync().join();
 
         // Then - verify that the version from GitProperties was used
         verify(databaseModelReader)
@@ -170,10 +166,9 @@ class DbSchemaPublisherVersionTest {
                 .thenReturn(expectedModel);
 
         DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, gitProperties);
-        DbSchemaPublisherEventListener publisherScheduler = new DbSchemaPublisherEventListener(publisher);
 
         // When
-        publisherScheduler.publishSchemaAsync().join();
+        publisher.publishDatabaseSchemaAsync().join();
 
         // Then - verify that BuildProperties version was used (not GitProperties)
         verify(databaseModelReader)
@@ -201,10 +196,9 @@ class DbSchemaPublisherVersionTest {
                 .thenReturn(expectedModel);
 
         DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, null, null);
-        DbSchemaPublisherEventListener publisherScheduler = new DbSchemaPublisherEventListener(publisher);
 
         // When
-        publisherScheduler.publishSchemaAsync().join();
+        publisher.publishDatabaseSchemaAsync().join();
 
         // Then - verify that fallback "na" was used when git.build.version is not available
         verify(databaseModelReader)

@@ -5,12 +5,15 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -30,6 +33,9 @@ class SchemaUploadIntegrationTest {
 
     @Autowired
     private DbSchemaPublisherEventListener dbSchemaPublisherEventListener;
+
+    @MockitoSpyBean(name = DbSchemaPublisher.DB_SCHEMA_PUBLISHER_TASK_EXECUTOR)
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Container
     @ServiceConnection
@@ -117,36 +123,10 @@ class SchemaUploadIntegrationTest {
         assertThat(requestBody)
                 .withFailMessage("Request should contain user_profiles table")
                 .contains("user_profiles");
-    }
 
-    @Test
-    void shouldPublishSchemaAsynchronously() throws Exception {
-        // Reset WireMock to clear any previous requests
-        wireMockServer.resetAll();
-
-        // Set up mock API endpoint
-        wireMockServer.stubFor(post(urlEqualTo("/api/dbschemas"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")));
-
-        // Explicitly call the async method amd wait for it to complete
-        dbSchemaPublisherEventListener.publishSchemaAsync().get();
-
-        // Verify the request was made
-        var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo("/api/dbschemas")));
-        assertThat(requests)
-                .withFailMessage("Expected exactly one API call to /api/dbschemas")
-                .hasSize(1);
-        String requestBody = requests.getFirst().getBodyAsString();
-
-        // Verify basic JSON structure
-        assertThat(requestBody).contains("systemComponentName")
-                .contains("schema")
-                .contains("test-app")
-                .contains("tables")
-                .contains("users")
-                .contains("user_profiles");
+        // Verify that the task was indeed executed asynchronously
+        Mockito.verify(threadPoolTaskExecutor, Mockito.times(1))
+                .execute(Mockito.any(Runnable.class));
     }
 
     private static void mockOAuthTokenResponse() {
