@@ -4,7 +4,6 @@ import ch.admin.bit.jeap.dbschema.archrepo.client.ArchitectureRepositoryService;
 import ch.admin.bit.jeap.dbschema.archrepo.client.CreateOrUpdateDbSchemaDto;
 import ch.admin.bit.jeap.dbschema.model.DatabaseSchema;
 import ch.admin.bit.jeap.dbschema.reader.DatabaseModelReader;
-import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
@@ -19,6 +18,9 @@ class DbSchemaPublisher {
 
     static final String DB_SCHEMA_PUBLISHER_TASK_EXECUTOR = "dbSchemaPublisherTaskExecutor";
 
+    private static final String TIMER_NAME = "jeap-publish-database-schema";
+    private static final String SPAN_NAME = "publish-db-schema";
+
     private final String applicationName;
     private final ArchRepoProperties properties;
     private final ArchitectureRepositoryService architectureRepositoryService;
@@ -26,13 +28,16 @@ class DbSchemaPublisher {
     private final DatabaseModelReader databaseModelReader;
     private final BuildProperties buildProperties;
     private final GitProperties gitProperties;
+    private final TracingTimer tracingTimer;
 
-    DbSchemaPublisher(String applicationName, ArchRepoProperties properties,
+    DbSchemaPublisher(String applicationName,
+                      ArchRepoProperties properties,
                       ArchitectureRepositoryService architectureRepositoryService,
                       DataSource dataSource,
                       DatabaseModelReader databaseModelReader,
                       BuildProperties buildProperties,
-                      GitProperties gitProperties) {
+                      GitProperties gitProperties,
+                      TracingTimer tracingTimer) {
         this.applicationName = applicationName;
         this.properties = properties;
         this.architectureRepositoryService = architectureRepositoryService;
@@ -40,37 +45,37 @@ class DbSchemaPublisher {
         this.databaseModelReader = databaseModelReader;
         this.buildProperties = buildProperties;
         this.gitProperties = gitProperties;
+        this.tracingTimer = tracingTimer;
     }
 
     @Async(DB_SCHEMA_PUBLISHER_TASK_EXECUTOR)
-    @Timed(value = "jeap-publish-database-schema")
     public CompletableFuture<Void> publishDatabaseSchemaAsync() {
-        try {
-            publishDatabaseSchema();
-            return CompletableFuture.completedFuture(null);
-
-        } catch (SQLException e) {
-            log.error("Failed to read database schema", e);
-            return CompletableFuture.failedFuture(e);
-        } catch (Exception e) {
-            log.error("Failed to publish database schema", e);
-            return CompletableFuture.failedFuture(e);
-        }
+        return tracingTimer.traceAndTime(SPAN_NAME, TIMER_NAME, () -> {
+            try {
+                publishDatabaseSchema();
+                return CompletableFuture.completedFuture(null);
+            } catch (SQLException e) {
+                log.error("Failed to read database schema", e);
+                return CompletableFuture.failedFuture(e);
+            } catch (Exception e) {
+                log.error("Failed to publish database schema", e);
+                return CompletableFuture.failedFuture(e);
+            }
+        });
     }
 
     void publishDatabaseSchema() throws SQLException {
-        // Read database schema
         log.debug("Reading database schema from {} schema", properties.getSchemaName());
         DatabaseSchema databaseSchema = databaseModelReader.readDatabaseModel(
                 dataSource,
                 properties.getSchemaName(),
                 getAppVersion());
 
-        // Publish schema to the archrepo service
         CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(applicationName, databaseSchema);
         log.info("Publishing schema DTO: componentName={}, tableCount={} to {} with client registration {}",
                 dto.systemComponentName(), dto.schema().tables().size(), properties.getUrl(), properties.getOauthClient());
         architectureRepositoryService.publishDbSchema(dto);
+        log.info("Published database schema successfully");
     }
 
     private String getAppVersion() {

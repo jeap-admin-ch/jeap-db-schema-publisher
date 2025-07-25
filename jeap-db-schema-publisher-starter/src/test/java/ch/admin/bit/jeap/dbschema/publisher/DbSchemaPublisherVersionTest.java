@@ -18,6 +18,8 @@ import static org.mockito.Mockito.*;
 
 class DbSchemaPublisherVersionTest {
 
+    private final static TracingTimer TRACING_TIMER = new TracingTimer(null, null);
+
     @Test
     void shouldUseBuildPropertiesVersionWhenAvailable() throws SQLException {
         // Given
@@ -38,7 +40,7 @@ class DbSchemaPublisherVersionTest {
         when(databaseModelReader.readDatabaseModel(eq(dataSource), eq("test"), any()))
                 .thenReturn(expectedModel);
 
-        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, null);
+        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, null, TRACING_TIMER);
 
         // When
         publisher.publishDatabaseSchemaAsync().join();
@@ -62,7 +64,7 @@ class DbSchemaPublisherVersionTest {
         when(databaseModelReader.readDatabaseModel(eq(dataSource), eq("test"), any()))
                 .thenReturn(expectedModel);
 
-        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, null, null);
+        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, null, null, TRACING_TIMER);
 
         // When
         publisher.publishDatabaseSchemaAsync().join();
@@ -99,7 +101,7 @@ class DbSchemaPublisherVersionTest {
         when(databaseModelReader.readDatabaseModel(eq(dataSource), eq("myschema"), any()))
                 .thenReturn(mockModel);
 
-        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, null);
+        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, null, TRACING_TIMER);
 
         // When
         publisher.publishDatabaseSchemaAsync().join();
@@ -129,7 +131,7 @@ class DbSchemaPublisherVersionTest {
         when(databaseModelReader.readDatabaseModel(eq(dataSource), eq("test"), any()))
                 .thenReturn(expectedModel);
 
-        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, null, gitProperties);
+        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, null, gitProperties, TRACING_TIMER);
 
         // When
         publisher.publishDatabaseSchemaAsync().join();
@@ -165,7 +167,7 @@ class DbSchemaPublisherVersionTest {
         when(databaseModelReader.readDatabaseModel(eq(dataSource), eq("test"), any()))
                 .thenReturn(expectedModel);
 
-        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, gitProperties);
+        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, gitProperties, TRACING_TIMER);
 
         // When
         publisher.publishDatabaseSchemaAsync().join();
@@ -195,7 +197,7 @@ class DbSchemaPublisherVersionTest {
         when(databaseModelReader.readDatabaseModel(eq(dataSource), eq("test"), any()))
                 .thenReturn(expectedModel);
 
-        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, null, null);
+        DbSchemaPublisher publisher = new DbSchemaPublisher("test-app", properties, architectureRepositoryService, dataSource, databaseModelReader, null, null, TRACING_TIMER);
 
         // When
         publisher.publishDatabaseSchemaAsync().join();
