@@ -6,6 +6,7 @@ import org.springframework.context.event.EventListener;
 
 @Slf4j
 class DbSchemaPublisherEventListener {
+
     private final DbSchemaPublisher dbSchemaPublisher;
 
     public DbSchemaPublisherEventListener(DbSchemaPublisher dbSchemaPublisher) {
@@ -16,5 +17,4 @@ class DbSchemaPublisherEventListener {
     public void publishSchemaOnStartup() {
         dbSchemaPublisher.publishDatabaseSchemaAsync();
     }
-
 }

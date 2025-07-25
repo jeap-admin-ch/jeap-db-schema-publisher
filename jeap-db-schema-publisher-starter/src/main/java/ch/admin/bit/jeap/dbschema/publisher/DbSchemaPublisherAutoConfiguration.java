@@ -1,8 +1,10 @@
 package ch.admin.bit.jeap.dbschema.publisher;
 
+import brave.Tracer;
 import ch.admin.bit.jeap.dbschema.archrepo.client.ArchitectureRepositoryService;
 import ch.admin.bit.jeap.dbschema.archrepo.client.OAuth2ClientCredentialsRestClientInitializer;
 import ch.admin.bit.jeap.dbschema.reader.DatabaseModelReader;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -86,8 +88,11 @@ public class DbSchemaPublisherAutoConfiguration {
                                                DatabaseModelReader databaseModelReader,
                                                @Value("${spring.application.name}") String applicationName,
                                                @Autowired(required = false) BuildProperties buildProperties,
-                                               @Autowired(required = false) GitProperties gitProperties) {
-        return new DbSchemaPublisher(applicationName, properties, architectureRepositoryService, dataSource, databaseModelReader, buildProperties, gitProperties);
+                                               @Autowired(required = false) GitProperties gitProperties,
+                                               @Autowired(required = false) Tracer tracer,
+                                               @Autowired(required = false) MeterRegistry meterRegistry) {
+        return new DbSchemaPublisher(applicationName, properties, architectureRepositoryService,
+                dataSource, databaseModelReader, buildProperties, gitProperties, new TracingTimer(tracer, meterRegistry));
     }
 
     @Bean
