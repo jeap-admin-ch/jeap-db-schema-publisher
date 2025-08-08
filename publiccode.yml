@@ -1,0 +1,42 @@
+publiccodeYmlVersion: 0.4.0
+name: jeap-db-schema-publisher
+applicationSuite: jEAP
+softwareVersion: 1.2.0
+releaseDate: 2025-08-08
+url: "https://github.com/jeap-admin-ch/jeap-db-schema-publisher.git"
+landingURL: "https://github.com/jeap-admin-ch/jeap"
+platforms:
+  - web
+categories:
+  - application-development
+developmentStatus: stable
+softwareType: library
+description:
+  en:
+    localisedName: jeap-db-schema-publisher
+    shortDescription: Publishes a jEAP application's DB schema to the jEAP Architecture Repository Service at startup.
+    longDescription: >
+      jEAP DB Schema Publisher is a library based on Spring Boot to publish the DB schema of a jEAP application to the
+      jEAP Architecture Repository Service.
+
+      * If activated by providing a valid `jeap.archrepo.url` property, it will
+         automatically publish the DB schema to the jEAP Architecture Repository Service.
+      * The request to the Archrepo service will be authenticated using OAuth2. By default, an oauth client registration named
+        `archrepo-client` is expected to be configured under `spring.security.oauth2.client.registration`.
+      * The DB schema will be read and published at application startup, on a best-effort basis. The DB schema upload
+         process is designed to have the least possible impact on application, i.e. it will not block the application or
+         cause startup to fail if the upload fails.
+    features:
+      - Automatically publishes the DB schema of a microservice to the Archrepo service on application startup
+      - Non-blocking, best-effort schema upload to avoid startup delays or failures
+legal:
+  license: Apache-2.0
+maintenance:
+  type: internal
+  contacts:
+    - name: Federal Office of Information Technology, Systems and Telecommunication FOITT
+      email: jeap-community@bit.admin.ch
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - en
