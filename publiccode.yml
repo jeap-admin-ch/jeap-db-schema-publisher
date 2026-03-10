@@ -1,8 +1,8 @@
 publiccodeYmlVersion: 0.4.0
 name: jeap-db-schema-publisher
 applicationSuite: jEAP
-softwareVersion: 1.20.0
-releaseDate: 2026-03-02
+softwareVersion: 1.21.0
+releaseDate: 2026-03-10
 url: "https://github.com/jeap-admin-ch/jeap-db-schema-publisher.git"
 landingURL: "https://github.com/jeap-admin-ch/jeap"
 platforms:
