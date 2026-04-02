@@ -46,7 +46,7 @@ class SchemaUploadIntegrationTest {
 
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16")
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17-alpine")
             .asCompatibleSubstituteFor("postgres"))
             .withDatabaseName("testdb")
             .withUsername("testuser")
