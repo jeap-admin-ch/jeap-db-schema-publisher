@@ -33,7 +33,7 @@
     <parent>
         <artifactId>jeap-internal-spring-boot-parent</artifactId>
         <groupId>ch.admin.bit.jeap</groupId>
-        <version>7.0.0-alpha-springboot4</version>
+        <version>7.0.2-alpha-springboot4</version>
     </parent>
 
     <modules>
@@ -42,7 +42,6 @@
     </modules>
 
     <properties>
-        <tomcat-embed-core.version>11.0.21</tomcat-embed-core.version>
         <maven.javadoc.skip>false</maven.javadoc.skip>
     </properties>
 
