@@ -17,9 +17,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
@@ -36,9 +36,6 @@ import static org.awaitility.Awaitility.await;
 class SchemaUploadIntegrationTest {
 
     @Autowired
-    private DbSchemaPublisherEventListener dbSchemaPublisherEventListener;
-
-    @Autowired
     private MeterRegistry meterRegistry;
 
     @MockitoSpyBean(name = DbSchemaPublisher.DB_SCHEMA_PUBLISHER_TASK_EXECUTOR)
@@ -46,7 +43,7 @@ class SchemaUploadIntegrationTest {
 
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17-alpine")
+    static PostgreSQLContainer postgres = new PostgreSQLContainer(DockerImageName.parse("postgres:17-alpine")
             .asCompatibleSubstituteFor("postgres"))
             .withDatabaseName("testdb")
             .withUsername("testuser")
@@ -107,27 +104,21 @@ class SchemaUploadIntegrationTest {
 
         String requestBody = request.getBodyAsString();
 
-        // Verify basic JSON structure
+
         assertThat(requestBody)
+                // Verify basic JSON structure
                 .withFailMessage("Request should contain systemComponentName field")
-                .contains("systemComponentName");
-        assertThat(requestBody)
+                .contains("systemComponentName")
                 .withFailMessage("Request should contain schema field")
-                .contains("schema");
-
-        // Verify system configuration values
-        assertThat(requestBody)
+                .contains("schema")
+                // Verify system configuration values
                 .withFailMessage("Request should contain test-app value")
-                .contains("test-app");
-
-        // Verify database schema content - be more flexible with table names since JSON structure may vary
-        assertThat(requestBody)
+                .contains("test-app")
+                // Verify database schema content - be more flexible with table names since JSON structure may vary
                 .withFailMessage("Request should contain tables")
-                .contains("tables");
-        assertThat(requestBody)
+                .contains("tables")
                 .withFailMessage("Request should contain users table")
-                .contains("users");
-        assertThat(requestBody)
+                .contains("users")
                 .withFailMessage("Request should contain user_profiles table")
                 .contains("user_profiles");
 
