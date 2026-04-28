@@ -1,10 +1,10 @@
 package ch.admin.bit.jeap.dbschema.publisher;
 
-import brave.Tracer;
 import ch.admin.bit.jeap.dbschema.archrepo.client.ArchitectureRepositoryService;
 import ch.admin.bit.jeap.dbschema.archrepo.client.OAuth2ClientCredentialsRestClientInitializer;
 import ch.admin.bit.jeap.dbschema.reader.DatabaseModelReader;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.tracing.Tracer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

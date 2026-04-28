@@ -23,6 +23,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -78,15 +79,17 @@ class SchemaUploadIntegrationTest {
 
     @Test
     void shouldUploadSchemaOnStartup() {
-        // Wait for async publication to complete (since it's triggered by ApplicationReadyEvent)
+        // Wait for async publication to fully complete. The timer is recorded as the last step of the
+        // async task (after the HTTP response returns), so waiting for it ensures both the wiremock
+        // request and the timer were recorded.
         await()
                 .atMost(Duration.ofSeconds(60))
-                .untilAsserted(() -> {
-                    var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo("/api/dbschemas")));
-                    assertThat(requests)
-                            .withFailMessage("Expected at least one API call to /api/dbschemas")
-                            .hasSizeGreaterThan(0);
-                });
+                .untilAsserted(() -> assertThat(findPublishTimer())
+                        .withFailMessage("Expected timer for jeap-publish-database-schema to be recorded")
+                        .isPresent()
+                        .get()
+                        .extracting(Timer::count)
+                        .isEqualTo(1L));
 
         // Verify the request was made
         var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo("/api/dbschemas")));
@@ -125,12 +128,14 @@ class SchemaUploadIntegrationTest {
         // Verify that the task was indeed executed asynchronously
         Mockito.verify(threadPoolTaskExecutor, Mockito.times(1))
                 .execute(Mockito.any(Runnable.class));
+    }
 
-        Timer timer = (Timer) meterRegistry.getMeters().stream().filter(t -> t.getId().getName().contains("jeap-publish-database-schema"))
-                .toList().getFirst();
-        assertThat(timer.count())
-                .withFailMessage("Expected timer for jeap-publish-database-schema to be recorded")
-                .isOne();
+    private Optional<Timer> findPublishTimer() {
+        return meterRegistry.getMeters().stream()
+                .filter(t -> t.getId().getName().contains("jeap-publish-database-schema"))
+                .filter(Timer.class::isInstance)
+                .map(Timer.class::cast)
+                .findFirst();
     }
 
     private static void mockOAuthTokenResponse() {
