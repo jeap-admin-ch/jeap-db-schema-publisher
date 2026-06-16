@@ -32,6 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ActiveProfiles("test")
 class ArchitectureRepositoryServiceTest {
 
+    private static final String API_DBSCHEMAS_PATH = "/api/dbschemas";
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
+    private static final String APPLICATION_JSON = "application/json";
+    private static final String EXPECTED_ONE_API_CALL_MESSAGE = "Expected exactly one API call";
+    private static final String TEST_APP = "test-app";
+    private static final String BIGINT = "bigint";
+
     static WireMockServer wireMockServer = new WireMockServer(wireMockConfig()
             .dynamicPort()
             .http2PlainDisabled(true));
@@ -44,10 +51,10 @@ class ArchitectureRepositoryServiceTest {
         wireMockServer.start();
 
         // Set up mock API endpoint before Spring Boot starts
-        wireMockServer.stubFor(post(urlEqualTo("/api/dbschemas"))
+        wireMockServer.stubFor(post(urlEqualTo(API_DBSCHEMAS_PATH))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")));
+                        .withHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON)));
 
         registry.add("wiremock.port", () -> wireMockServer.port());
         registry.add("jeap.archrepo.url", () -> "http://localhost:" + wireMockServer.port());
@@ -67,38 +74,39 @@ class ArchitectureRepositoryServiceTest {
     }
 
     @Test
-    void shouldPublishDbSchemaSuccessfully() throws Exception {
+    void shouldPublishDbSchemaSuccessfully() {
         // Given
         DatabaseSchema databaseSchema = createTestDatabaseModel();
         CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(
-                "test-app",
+                TEST_APP,
                 databaseSchema
         );
 
         // Set up WireMock stub
-        wireMockServer.stubFor(post(urlEqualTo("/api/dbschemas"))
+        wireMockServer.stubFor(post(urlEqualTo(API_DBSCHEMAS_PATH))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")));
+                        .withHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON)));
 
         // When
         assertDoesNotThrow(() -> architectureRepositoryService.publishDbSchema(dto));
 
         // Then
-        var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo("/api/dbschemas")));
+        var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo(API_DBSCHEMAS_PATH)));
         assertThat(requests)
-                .withFailMessage("Expected exactly one API call")
+                .withFailMessage(EXPECTED_ONE_API_CALL_MESSAGE)
                 .hasSize(1);
 
         var request = requests.get(0);
-        assertThat(request.getHeader("Content-Type")).isEqualTo("application/json");
+        assertThat(request.getHeader(CONTENT_TYPE_HEADER)).isEqualTo(APPLICATION_JSON);
 
         // Verify request body contains expected JSON structure
         String requestBody = request.getBodyAsString();
-        assertThat(requestBody).contains("\"systemComponentName\":\"test-app\"");
-        assertThat(requestBody).contains("\"schema\"");
-        assertThat(requestBody).contains("\"tables\"");
-        assertThat(requestBody).contains("\"users\"");
+        assertThat(requestBody)
+                .contains("\"systemComponentName\":\"" + TEST_APP + "\"")
+                .contains("\"schema\"")
+                .contains("\"tables\"")
+                .contains("\"users\"");
     }
 
     private static void mockOAuthTokenResponse() {
@@ -106,7 +114,7 @@ class ArchitectureRepositoryServiceTest {
         wireMockServer.stubFor(post(urlEqualTo("/oauth/token"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON)
                         .withBody("{\"access_token\":\"test-token\",\"token_type\":\"Bearer\",\"expires_in\":3600}")));
     }
 
@@ -115,24 +123,24 @@ class ArchitectureRepositoryServiceTest {
         // Given
         DatabaseSchema databaseSchema = createTestDatabaseModel();
         CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(
-                "test-app",
+                TEST_APP,
                 databaseSchema
         );
 
         // Set up WireMock stub for server error
-        wireMockServer.stubFor(post(urlEqualTo("/api/dbschemas"))
+        wireMockServer.stubFor(post(urlEqualTo(API_DBSCHEMAS_PATH))
                 .willReturn(aResponse()
                         .withStatus(500)
-                        .withHeader("Content-Type", "application/json")));
+                        .withHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON)));
 
         // When & Then
         assertThrows(HttpServerErrorException.class,
                 () -> architectureRepositoryService.publishDbSchema(dto));
 
         // Verify request was made
-        var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo("/api/dbschemas")));
+        var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo(API_DBSCHEMAS_PATH)));
         assertThat(requests)
-                .withFailMessage("Expected exactly one API call")
+                .withFailMessage(EXPECTED_ONE_API_CALL_MESSAGE)
                 .hasSize(1);
     }
 
@@ -141,29 +149,29 @@ class ArchitectureRepositoryServiceTest {
         // Given
         DatabaseSchema databaseSchema = createTestDatabaseModel();
         CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(
-                "test-app",
+                TEST_APP,
                 databaseSchema
         );
 
         // Set up WireMock stub for client error
-        wireMockServer.stubFor(post(urlEqualTo("/api/dbschemas"))
+        wireMockServer.stubFor(post(urlEqualTo(API_DBSCHEMAS_PATH))
                 .willReturn(aResponse()
                         .withStatus(400)
-                        .withHeader("Content-Type", "application/json")));
+                        .withHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON)));
 
         // When & Then
         assertThrows(HttpClientErrorException.class,
                 () -> architectureRepositoryService.publishDbSchema(dto));
 
         // Verify request was made
-        var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo("/api/dbschemas")));
+        var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo(API_DBSCHEMAS_PATH)));
         assertThat(requests)
-                .withFailMessage("Expected exactly one API call")
+                .withFailMessage(EXPECTED_ONE_API_CALL_MESSAGE)
                 .hasSize(1);
     }
 
     @Test
-    void shouldSerializeComplexDatabaseSchema() throws Exception {
+    void shouldSerializeComplexDatabaseSchema() {
         // Given
         DatabaseSchema databaseSchema = createComplexDatabaseModel();
         CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(
@@ -172,35 +180,36 @@ class ArchitectureRepositoryServiceTest {
         );
 
         // Set up WireMock stub
-        wireMockServer.stubFor(post(urlEqualTo("/api/dbschemas"))
+        wireMockServer.stubFor(post(urlEqualTo(API_DBSCHEMAS_PATH))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON)
                         .withBody("{\"status\":\"success\"}")));
 
         // When
         assertDoesNotThrow(() -> architectureRepositoryService.publishDbSchema(dto));
 
         // Then
-        var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo("/api/dbschemas")));
+        var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo(API_DBSCHEMAS_PATH)));
         assertThat(requests)
-                .withFailMessage("Expected exactly one API call")
+                .withFailMessage(EXPECTED_ONE_API_CALL_MESSAGE)
                 .hasSize(1);
 
         String requestBody = requests.getFirst().getBodyAsString();
 
         // Verify complex schema is properly serialized
-        assertThat(requestBody).contains("\"systemComponentName\":\"complex-component\"");
-        assertThat(requestBody).contains("\"name\":\"testdb\"");
-        assertThat(requestBody).contains("\"version\":\"2.0\"");
-        assertThat(requestBody).contains("\"users\"");
-        assertThat(requestBody).contains("\"orders\"");
-        assertThat(requestBody).contains("\"primaryKey\"");
-        assertThat(requestBody).contains("\"foreignKeys\"");
+        assertThat(requestBody)
+                .contains("\"systemComponentName\":\"complex-component\"")
+                .contains("\"name\":\"testdb\"")
+                .contains("\"version\":\"2.0\"")
+                .contains("\"users\"")
+                .contains("\"orders\"")
+                .contains("\"primaryKey\"")
+                .contains("\"foreignKeys\"");
     }
 
     private DatabaseSchema createTestDatabaseModel() {
-        TableColumn idColumn = new TableColumn("id", "bigint", false);
+        TableColumn idColumn = new TableColumn("id", BIGINT, false);
         TableColumn nameColumn = new TableColumn("name", "varchar(100)", false);
 
         TablePrimaryKey primaryKey = new TablePrimaryKey("users_pk", List.of("id"));
@@ -217,7 +226,7 @@ class ArchitectureRepositoryServiceTest {
 
     private DatabaseSchema createComplexDatabaseModel() {
         // Users table
-        TableColumn userIdColumn = new TableColumn("id", "bigint", false);
+        TableColumn userIdColumn = new TableColumn("id", BIGINT, false);
         TableColumn userNameColumn = new TableColumn("name", "varchar(100)", false);
         TableColumn userEmailColumn = new TableColumn("email", "varchar(255)", true);
 
@@ -231,8 +240,8 @@ class ArchitectureRepositoryServiceTest {
         );
 
         // Orders table
-        TableColumn orderIdColumn = new TableColumn("id", "bigint", false);
-        TableColumn orderUserIdColumn = new TableColumn("user_id", "bigint", false);
+        TableColumn orderIdColumn = new TableColumn("id", BIGINT, false);
+        TableColumn orderUserIdColumn = new TableColumn("user_id", BIGINT, false);
         TableColumn orderAmountColumn = new TableColumn("amount", "decimal(10,2)", false);
 
         TablePrimaryKey ordersPrimaryKey = new TablePrimaryKey("orders_pk", List.of("id"));

@@ -5,8 +5,6 @@ import ch.admin.bit.jeap.dbschema.archrepo.client.CreateOrUpdateDbSchemaDto;
 import ch.admin.bit.jeap.dbschema.model.DatabaseSchema;
 import ch.admin.bit.jeap.dbschema.reader.DatabaseModelReader;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.info.BuildProperties;
-import org.springframework.boot.info.GitProperties;
 import org.springframework.scheduling.annotation.Async;
 
 import javax.sql.DataSource;
@@ -26,8 +24,7 @@ class DbSchemaPublisher {
     private final ArchitectureRepositoryService architectureRepositoryService;
     private final DataSource dataSource;
     private final DatabaseModelReader databaseModelReader;
-    private final BuildProperties buildProperties;
-    private final GitProperties gitProperties;
+    private final AppVersionProvider appVersionProvider;
     private final TracingTimer tracingTimer;
 
     DbSchemaPublisher(String applicationName,
@@ -35,16 +32,14 @@ class DbSchemaPublisher {
                       ArchitectureRepositoryService architectureRepositoryService,
                       DataSource dataSource,
                       DatabaseModelReader databaseModelReader,
-                      BuildProperties buildProperties,
-                      GitProperties gitProperties,
+                      AppVersionProvider appVersionProvider,
                       TracingTimer tracingTimer) {
         this.applicationName = applicationName;
         this.properties = properties;
         this.architectureRepositoryService = architectureRepositoryService;
         this.dataSource = dataSource;
         this.databaseModelReader = databaseModelReader;
-        this.buildProperties = buildProperties;
-        this.gitProperties = gitProperties;
+        this.appVersionProvider = appVersionProvider;
         this.tracingTimer = tracingTimer;
     }
 
@@ -54,12 +49,10 @@ class DbSchemaPublisher {
             try {
                 publishDatabaseSchema();
                 return CompletableFuture.completedFuture(null);
-            } catch (SQLException e) {
-                log.error("Failed to read database schema", e);
-                return CompletableFuture.failedFuture(e);
-            } catch (Exception e) {
-                log.error("Failed to publish database schema", e);
-                return CompletableFuture.failedFuture(e);
+            } catch (Exception _) {
+                String errorMessage = "Failed to publish database schema";
+                log.error(errorMessage);
+                return CompletableFuture.failedFuture(new IllegalStateException(errorMessage));
             }
         });
     }
@@ -69,25 +62,12 @@ class DbSchemaPublisher {
         DatabaseSchema databaseSchema = databaseModelReader.readDatabaseModel(
                 dataSource,
                 properties.getSchemaName(),
-                getAppVersion());
+                appVersionProvider.getVersion());
 
         CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(applicationName, databaseSchema);
         log.info("Publishing schema DTO: componentName={}, tableCount={} to {} with client registration {}",
                 dto.systemComponentName(), dto.schema().tables().size(), properties.getUrl(), properties.getOauthClient());
         architectureRepositoryService.publishDbSchema(dto);
         log.info("Published database schema successfully");
-    }
-
-    private String getAppVersion() {
-        if (buildProperties != null) {
-            return buildProperties.getVersion();
-        }
-        if (gitProperties != null) {
-            String gitBuildVersion = gitProperties.get("git.build.version");
-            if (gitBuildVersion != null) {
-                return gitBuildVersion;
-            }
-        }
-        return "na";
     }
 }

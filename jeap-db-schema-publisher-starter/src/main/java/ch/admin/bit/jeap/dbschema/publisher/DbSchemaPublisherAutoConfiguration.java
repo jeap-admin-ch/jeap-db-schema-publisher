@@ -92,7 +92,8 @@ public class DbSchemaPublisherAutoConfiguration {
                                                @Autowired(required = false) Tracer tracer,
                                                @Autowired(required = false) MeterRegistry meterRegistry) {
         return new DbSchemaPublisher(applicationName, properties, architectureRepositoryService,
-                dataSource, databaseModelReader, buildProperties, gitProperties, new TracingTimer(tracer, meterRegistry));
+                dataSource, databaseModelReader, new AppVersionProvider(buildProperties, gitProperties),
+                new TracingTimer(tracer, meterRegistry));
     }
 
     @Bean

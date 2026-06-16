@@ -20,6 +20,7 @@ class TracingTimer {
     private static final String TAG_STATUS = "status";
     private static final String STATUS_SUCCESS = "success";
     private static final String STATUS_ERROR = "error";
+    private static final String NON_EXCEPTION_FAILURE_MESSAGE = "Synchronous non-exception failure while invoking action";
 
     private final Tracer tracer;
     private final MeterRegistry meterRegistry;
@@ -32,23 +33,28 @@ class TracingTimer {
     CompletableFuture<Void> traceAndTime(String spanName, String timerName, Supplier<CompletableFuture<Void>> action) {
         Span span = (tracer != null) ? tracer.nextSpan().name(spanName).start() : null;
         Timer.Sample sample = (meterRegistry != null) ? Timer.start(meterRegistry) : null;
+        CompletableFuture<Void> actionFuture = null;
+        Exception synchronousException = null;
 
-        try (Tracer.SpanInScope ignored = (span != null) ? tracer.withSpan(span) : null) {
-            return action.get().whenComplete((result, ex) -> safelyRecordCompletion(timerName, sample, span, ex));
-        } catch (Throwable ex) {
-            // action.get() threw synchronously instead of returning a failed future — record on the timer and span
-            // before propagating, otherwise the started span and sample would leak. Catch Throwable so Errors are
-            // cleaned up too; only unchecked exceptions can escape the try block, so the rethrow is a precise
-            // rethrow and does not require a `throws` declaration.
+        Tracer.SpanInScope spanInScope = (span != null) ? tracer.withSpan(span) : null;
+        try (spanInScope) {
+            actionFuture = action.get();
+            return actionFuture.whenComplete((result, ex) -> safelyRecordCompletion(timerName, sample, span, ex));
+        } catch (Exception ex) {
+            synchronousException = ex;
             safelyRecordCompletion(timerName, sample, span, ex);
             throw ex;
+        } finally {
+            if (actionFuture == null && synchronousException == null) {
+                safelyRecordCompletion(timerName, sample, span, new Exception(NON_EXCEPTION_FAILURE_MESSAGE));
+            }
         }
     }
 
     private void safelyRecordCompletion(String timerName, Timer.Sample sample, Span span, Throwable original) {
         try {
             recordCompletion(timerName, sample, span, original);
-        } catch (RuntimeException | Error cleanupEx) {
+        } catch (Exception cleanupEx) {
             // A failure in metrics/tracing recording must never mask the original operation failure. Attach it as
             // suppressed so it remains visible. If there is no original failure (success path), propagate the
             // recording failure so the caller learns about it.

@@ -28,6 +28,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 class DatabaseSchemaReaderTest {
 
+    private static final String TABLE_USERS = "users";
+    private static final String TABLE_USER_PROFILES = "user_profiles";
+    private static final String TABLE_USER_SESSIONS = "user_sessions";
+    private static final String COL_USER_ID = "user_id";
+    private static final String COL_SESSION_ID = "session_id";
+    private static final String TYPE_VARCHAR = "varchar";
+
     @Container
     @ServiceConnection
     static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17-alpine")
@@ -64,9 +71,9 @@ class DatabaseSchemaReaderTest {
                 .toList();
 
         assertThat(tableNames)
-                .contains("users")
-                .contains("user_profiles")
-                .contains("user_sessions");
+                .contains(TABLE_USERS)
+                .contains(TABLE_USER_PROFILES)
+                .contains(TABLE_USER_SESSIONS);
     }
 
     @Test
@@ -76,22 +83,22 @@ class DatabaseSchemaReaderTest {
 
         // Then
         Optional<Table> usersTable = model.tables().stream()
-                .filter(t -> "users".equals(t.name()))
+                .filter(t -> TABLE_USERS.equals(t.name()))
                 .findFirst();
 
         assertThat(usersTable).isPresent();
         Table users = usersTable.get();
 
         // Check table structure
-        assertThat(users.name()).isEqualTo("users");
+        assertThat(users.name()).isEqualTo(TABLE_USERS);
         assertThat(users.columns()).isNotNull();
         assertThat(users.columns()).hasSizeGreaterThanOrEqualTo(7); // id, username, email, full_name, is_active, created_at, updated_at
 
         // Check specific columns
         assertColumnExists(users, "id", "bigserial", false);
-        assertColumnExists(users, "username", "varchar", false);
-        assertColumnExists(users, "email", "varchar", false);
-        assertColumnExists(users, "full_name", "varchar", true);
+        assertColumnExists(users, "username", TYPE_VARCHAR, false);
+        assertColumnExists(users, "email", TYPE_VARCHAR, false);
+        assertColumnExists(users, "full_name", TYPE_VARCHAR, true);
         assertColumnExists(users, "is_active", "bool", true);
 
         // Check primary key
@@ -109,22 +116,22 @@ class DatabaseSchemaReaderTest {
 
         // Then
         Optional<Table> userProfilesTable = model.tables().stream()
-                .filter(t -> "user_profiles".equals(t.name()))
+                .filter(t -> TABLE_USER_PROFILES.equals(t.name()))
                 .findFirst();
 
         assertThat(userProfilesTable).isPresent();
         Table userProfiles = userProfilesTable.get();
 
         // Check table structure
-        assertThat(userProfiles.name()).isEqualTo("user_profiles");
+        assertThat(userProfiles.name()).isEqualTo(TABLE_USER_PROFILES);
         assertThat(userProfiles.columns()).isNotNull();
         assertThat(userProfiles.columns()).hasSizeGreaterThanOrEqualTo(11); // Updated to include new session reference columns
 
         // Check specific columns
         assertColumnExists(userProfiles, "id", "bigserial", false);
-        assertColumnExists(userProfiles, "user_id", "int8", false);
+        assertColumnExists(userProfiles, COL_USER_ID, "int8", false);
         assertColumnExists(userProfiles, "bio", "text", true);
-        assertColumnExists(userProfiles, "avatar_url", "varchar", true);
+        assertColumnExists(userProfiles, "avatar_url", TYPE_VARCHAR, true);
 
         // Check primary key
         assertThat(userProfiles.primaryKey()).isNotNull();
@@ -139,8 +146,8 @@ class DatabaseSchemaReaderTest {
                 .filter(fk -> "fk_user_profiles_user_id".equals(fk.name()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(userForeignKey.columnNames()).isEqualTo(List.of("user_id"));
-        assertThat(userForeignKey.referencedTableName()).isEqualTo("users");
+        assertThat(userForeignKey.columnNames()).isEqualTo(List.of(COL_USER_ID));
+        assertThat(userForeignKey.referencedTableName()).isEqualTo(TABLE_USERS);
         assertThat(userForeignKey.referencedColumnNames()).isEqualTo(List.of("id"));
 
         // Check the new foreign key to user_sessions table (composite key)
@@ -149,8 +156,8 @@ class DatabaseSchemaReaderTest {
                 .findFirst()
                 .orElseThrow();
         assertThat(sessionForeignKey.columnNames()).containsExactlyInAnyOrder("current_session_user_id", "current_session_id");
-        assertThat(sessionForeignKey.referencedTableName()).isEqualTo("user_sessions");
-        assertThat(sessionForeignKey.referencedColumnNames()).containsExactlyInAnyOrder("user_id", "session_id");
+        assertThat(sessionForeignKey.referencedTableName()).isEqualTo(TABLE_USER_SESSIONS);
+        assertThat(sessionForeignKey.referencedColumnNames()).containsExactlyInAnyOrder(COL_USER_ID, COL_SESSION_ID);
     }
 
     @Test
@@ -160,21 +167,21 @@ class DatabaseSchemaReaderTest {
 
         // Then
         Optional<Table> userSessionsTable = model.tables().stream()
-                .filter(t -> "user_sessions".equals(t.name()))
+                .filter(t -> TABLE_USER_SESSIONS.equals(t.name()))
                 .findFirst();
 
         assertThat(userSessionsTable).isPresent();
         Table userSessions = userSessionsTable.get();
 
         // Check table structure
-        assertThat(userSessions.name()).isEqualTo("user_sessions");
+        assertThat(userSessions.name()).isEqualTo(TABLE_USER_SESSIONS);
         assertThat(userSessions.columns()).isNotNull();
         assertThat(userSessions.columns()).hasSizeGreaterThanOrEqualTo(9);
 
         // Check specific columns
-        assertColumnExists(userSessions, "user_id", "int8", false);
-        assertColumnExists(userSessions, "session_id", "varchar", false);
-        assertColumnExists(userSessions, "session_token", "varchar", false);
+        assertColumnExists(userSessions, COL_USER_ID, "int8", false);
+        assertColumnExists(userSessions, COL_SESSION_ID, TYPE_VARCHAR, false);
+        assertColumnExists(userSessions, "session_token", TYPE_VARCHAR, false);
         assertColumnExists(userSessions, "ip_address", "inet", true);
         assertColumnExists(userSessions, "user_agent", "text", true);
         assertColumnExists(userSessions, "is_active", "bool", true);
@@ -182,7 +189,7 @@ class DatabaseSchemaReaderTest {
 
         // Check composite primary key - this is the key test for composite keys
         assertThat(userSessions.primaryKey()).isNotNull();
-        assertThat(userSessions.primaryKey().columnNames()).containsExactlyInAnyOrder("user_id", "session_id");
+        assertThat(userSessions.primaryKey().columnNames()).containsExactlyInAnyOrder(COL_USER_ID, COL_SESSION_ID);
 
         // Check foreign key to users table
         assertThat(userSessions.foreignKeys()).isNotEmpty();
@@ -190,8 +197,8 @@ class DatabaseSchemaReaderTest {
 
         TableForeignKey foreignKey = userSessions.foreignKeys().getFirst();
         assertThat(foreignKey.name()).isEqualTo("fk_user_sessions_user_id");
-        assertThat(foreignKey.columnNames()).isEqualTo(List.of("user_id"));
-        assertThat(foreignKey.referencedTableName()).isEqualTo("users");
+        assertThat(foreignKey.columnNames()).isEqualTo(List.of(COL_USER_ID));
+        assertThat(foreignKey.referencedTableName()).isEqualTo(TABLE_USERS);
         assertThat(foreignKey.referencedColumnNames()).isEqualTo(List.of("id"));
     }
 

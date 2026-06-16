@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 > - Spring Boot 3 maintenance (bug fixes, patches, and regular updates) continues on branch `release/springboot3`.
 
+## [3.3.1] - 2026-06-16
+
+### Fixed
+
+- Sonar issues
+- Deprecated spring boot starter
+
 ## [3.3.0] - 2026-06-12
 
 ### Changed
