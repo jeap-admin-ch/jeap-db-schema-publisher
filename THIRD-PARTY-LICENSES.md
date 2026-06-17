@@ -10,8 +10,6 @@ Apache License Version 2.0
 
  * ch.admin.bit.jeap:jeap-db-schema-publisher-model-reader - [ch.admin.bit.jeap:jeap-db-schema-publisher-model-reader](https://github.com/jeap-admin-ch/jeap-db-schema-publisher/tree/main/jeap-db-schema-publisher-model-reader)
  * Jackson-annotations - [com.fasterxml.jackson.core:jackson-annotations](https://github.com/FasterXML/jackson)
- * Jackson-core - [com.fasterxml.jackson.core:jackson-core](https://github.com/FasterXML/jackson-core)
- * jackson-databind - [com.fasterxml.jackson.core:jackson-databind](https://github.com/FasterXML/jackson)
  * docker-java-api - [com.github.docker-java:docker-java-api](https://github.com/docker-java/docker-java)
  * docker-java-transport - [com.github.docker-java:docker-java-transport](https://github.com/docker-java/docker-java)
  * docker-java-transport-zerodep - [com.github.docker-java:docker-java-transport-zerodep](https://github.com/docker-java/docker-java)
@@ -197,4 +195,3 @@ Public Domain
 
  * AOP alliance - [aopalliance:aopalliance](http://aopalliance.sourceforge.net)
  * HdrHistogram - [org.hdrhistogram:HdrHistogram](http://hdrhistogram.github.io/HdrHistogram/)
- * LatencyUtils - [org.latencyutils:LatencyUtils](http://latencyutils.github.io/LatencyUtils/)
