@@ -1,18 +1,36 @@
 # jEAP DB Schema Publisher
 
-jEAP DB Schema Publisher is a library based on Spring Boot to publish the DB schema of a jEAP application to the
-jEAP Architecture Repository Service.
+jEAP DB Schema Publisher is a Spring Boot library that publishes the relational database schema of a
+jEAP application to the jEAP Architecture Repository Service (archrepo). On every startup it reads the
+live schema from the application's `DataSource` via JDBC metadata and uploads it, so the architecture
+repository always reflects the deployed schema. It provides:
 
-* If activated by providing a valid `jeap.archrepo.url` property, it will
-   automatically publish the DB schema to the jEAP Architecture Repository Service.
-* The request to the Archrepo service will be authenticated using OAuth2. By default, an oauth client registration named
-  `archrepo-client` is expected to be configured under `spring.security.oauth2.client.registration`.
-* The DB schema will be read and published at application startup, on a best-effort basis. The DB schema upload
-   process is designed to have the least possible impact on application, i.e. it will not block the application or
-   cause startup to fail if the upload fails.
+* Automatic schema upload, triggered by the Spring `ApplicationReadyEvent`
+* A non-blocking, best-effort upload that never delays or fails application startup
+* OAuth2 client-credentials authentication against the archrepo API
+* Reading of tables, columns, primary keys and foreign keys from JDBC `DatabaseMetaData`
+* Optional Micrometer tracing and timing of the publish operation
 
-See [ArchRepoProperties](./src/main/java/ch/admin/jeap/archrepo/ArchRepoProperties.java) for a reference of all the
-available configuration properties.
+## Documentation
+
+Start with [Getting started](docs/getting-started.md), then follow the links below.
+
+| Topic                                                | File                                                     |
+|------------------------------------------------------|----------------------------------------------------------|
+| Getting started (add the dependency, enable upload)  | [docs/getting-started.md](docs/getting-started.md)       |
+| How it works (startup flow, schema model)            | [docs/how-it-works.md](docs/how-it-works.md)             |
+| Configuration reference (`jeap.archrepo.*`)          | [docs/configuration.md](docs/configuration.md)           |
+| Authentication (OAuth2 client credentials)           | [docs/authentication.md](docs/authentication.md)         |
+
+## Modules
+
+Group id for all modules is `ch.admin.bit.jeap`; the version is managed by the jEAP Spring Boot parent.
+Consumers depend on `jeap-db-schema-publisher-starter`.
+
+| Module                               | Purpose                                                                                       |
+|--------------------------------------|-----------------------------------------------------------------------------------------------|
+| `jeap-db-schema-publisher-starter`   | Spring Boot auto-configuration; reads the schema on startup and uploads it to the archrepo     |
+| `jeap-db-schema-publisher-model-reader` | Reads tables, columns, keys from JDBC `DatabaseMetaData` into a `DatabaseSchema` model        |
 
 ## Changes
 
