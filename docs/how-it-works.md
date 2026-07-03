@@ -3,6 +3,42 @@
 The publisher hooks into the Spring Boot lifecycle to read and upload the database schema once the
 application is ready, without affecting business logic or startup time.
 
+## System overview
+
+```mermaid
+flowchart LR
+    subgraph MS["Microservice"]
+        direction TB
+
+        subgraph PUB["jeap-db-schema-publisher"]
+            direction TB
+            TRIGGER["ApplicationReadyEvent listener"]
+            ASYNC["Async DB schema upload task"]
+            TRIGGER -.->|"starts asynchronously"| ASYNC
+        end
+    end
+
+    subgraph AR["ArchRepo Service"]
+        direction TB
+        DOC["Database Schema Structure"]
+    end
+
+    AUTH["Authorization Server"]
+
+    ASYNC -->|"Upload DB schema"| DOC
+    ASYNC -->|"Get OAuth2 token"| AUTH
+    DOC -->|"Validate OAuth2 access"| AUTH
+
+%% Colors
+    classDef service fill:#F9CC9D,stroke:#333,stroke-width:2px,color:#000;
+    classDef component fill:#9FC5E8,stroke:#333,stroke-width:2px,color:#000;
+    classDef auth fill:#F9CC9D,stroke:#333,stroke-width:2px,color:#000;
+
+    class MS,AR service;
+    class PUB,TRIGGER,ASYNC,DOC component;
+    class AUTH auth;
+```
+
 ## Startup flow
 
 1. `DbSchemaPublisherEventListener` listens for the Spring `ApplicationReadyEvent`.
@@ -39,13 +75,13 @@ sequenceDiagram
 `DatabaseModelReader` (module `jeap-db-schema-publisher-model-reader`) maps JDBC metadata into a set of
 immutable records:
 
-| Record            | Fields                                                                  |
-|-------------------|-------------------------------------------------------------------------|
-| `DatabaseSchema`  | `name`, `version`, `tables`                                             |
-| `Table`           | `name`, `columns`, `foreignKeys`, `primaryKey`                          |
-| `TableColumn`     | `name`, `type`, `nullable`                                              |
-| `TablePrimaryKey` | `name`, `columnNames`                                                   |
-| `TableForeignKey` | `name`, `columnNames`, `referencedTableName`, `referencedColumnNames`  |
+| Record            | Fields                                                                |
+|-------------------|-----------------------------------------------------------------------|
+| `DatabaseSchema`  | `name`, `version`, `tables`                                           |
+| `Table`           | `name`, `columns`, `foreignKeys`, `primaryKey`                        |
+| `TableColumn`     | `name`, `type`, `nullable`                                            |
+| `TablePrimaryKey` | `name`, `columnNames`                                                 |
+| `TableForeignKey` | `name`, `columnNames`, `referencedTableName`, `referencedColumnNames` |
 
 Foreign keys that span multiple columns are grouped by foreign-key name. The `version` field is the
 application version resolved by `AppVersionProvider` from `BuildProperties`, then `GitProperties`

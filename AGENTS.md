@@ -13,7 +13,7 @@ HTTP call. The upload runs asynchronously and best-effort, so it never blocks or
 
 ## Repository layout
 
-```
+```text
 pom.xml                                   # Parent POM (packaging=pom); declares the modules below
 jeap-db-schema-publisher-model-reader/    # Reads JDBC metadata into the DatabaseSchema model (no Spring)
 jeap-db-schema-publisher-starter/         # @AutoConfiguration wiring; archrepo HTTP client; consumer-facing artifact
@@ -60,6 +60,9 @@ The `model-reader` module holds `reader.DatabaseModelReader` / `DatabaseModelFac
 
 When changing public behaviour, update the matching focused file under [docs/](docs/) (one topic per
 file) and the documentation index in the README.
+
+Validate that files under `docs/*.md` are valid Markdown compatible with a Docusaurus site. Also
+validate that Mermaid diagrams in the Markdown files use correct Mermaid syntax.
 
 ## Versioning
 

@@ -2,12 +2,12 @@
 
 All properties use the prefix `jeap.archrepo`. They are bound by `ArchRepoProperties`.
 
-| Name                                 | Default           | Description                                                                                                                               |
-|--------------------------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| `jeap.archrepo.url`                  | —                 | URL of the archrepo to publish the schema to. If unset, no archrepo client is created and nothing is published                            |
-| `jeap.archrepo.enabled`              | `true`            | If `false`, the whole auto-configuration is switched off (useful in tests). When `true`, publishing happens as soon as a `url` is set     |
-| `jeap.archrepo.oauth-client`         | `archrepo-client` | Id of the OAuth2 client registration used to authenticate with the archrepo (under `spring.security.oauth2.client.registration`)          |
-| `jeap.archrepo.database.schema-name` | `data`            | Name of the database schema to read and publish                                                                                          |
+| Name                                 | Default           | Description                                                                                                                           |
+|--------------------------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `jeap.archrepo.url`                  | —                 | URL of the archrepo to publish the schema to. If unset, no archrepo client is created and nothing is published                        |
+| `jeap.archrepo.enabled`              | `true`            | If `false`, the whole auto-configuration is switched off (useful in tests). When `true`, publishing happens as soon as a `url` is set |
+| `jeap.archrepo.oauth-client`         | `archrepo-client` | Id of the OAuth2 client registration used to authenticate with the archrepo (under `spring.security.oauth2.client.registration`)      |
+| `jeap.archrepo.database.schema-name` | `data`            | Name of the database schema to read and publish                                                                                       |
 
 ## When does the upload happen?
 

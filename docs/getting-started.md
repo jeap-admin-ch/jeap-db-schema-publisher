@@ -60,7 +60,6 @@ There is no code to write. On the next startup the publisher reads the schema fr
 `DataSource` (default schema name `data`) and posts it to the archrepo. Watch for these log lines:
 
 ```text
-Reading database model from schema: data
 Publishing schema DTO: componentName=..., tableCount=... to <url> with client registration archrepo-client
 Published database schema successfully
 ```

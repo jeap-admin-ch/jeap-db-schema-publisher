@@ -15,22 +15,22 @@ repository always reflects the deployed schema. It provides:
 
 Start with [Getting started](docs/getting-started.md), then follow the links below.
 
-| Topic                                                | File                                                     |
-|------------------------------------------------------|----------------------------------------------------------|
-| Getting started (add the dependency, enable upload)  | [docs/getting-started.md](docs/getting-started.md)       |
-| How it works (startup flow, schema model)            | [docs/how-it-works.md](docs/how-it-works.md)             |
-| Configuration reference (`jeap.archrepo.*`)          | [docs/configuration.md](docs/configuration.md)           |
-| Authentication (OAuth2 client credentials)           | [docs/authentication.md](docs/authentication.md)         |
+| Topic                                                | File                                                   |
+|------------------------------------------------------|--------------------------------------------------------|
+| Getting started (add the dependency, enable upload)  | [docs/getting-started.md](docs/getting-started.md)     |
+| How it works (startup flow, schema model)            | [docs/how-it-works.md](docs/how-it-works.md)           |
+| Configuration reference (`jeap.archrepo.*`)          | [docs/configuration.md](docs/configuration.md)         |
+| Authentication (OAuth2 client credentials)           | [docs/authentication.md](docs/authentication.md)       |
 
 ## Modules
 
 Group id for all modules is `ch.admin.bit.jeap`; the version is managed by the jEAP Spring Boot parent.
 Consumers depend on `jeap-db-schema-publisher-starter`.
 
-| Module                               | Purpose                                                                                       |
-|--------------------------------------|-----------------------------------------------------------------------------------------------|
-| `jeap-db-schema-publisher-starter`   | Spring Boot auto-configuration; reads the schema on startup and uploads it to the archrepo     |
-| `jeap-db-schema-publisher-model-reader` | Reads tables, columns, keys from JDBC `DatabaseMetaData` into a `DatabaseSchema` model        |
+| Module                                  | Purpose                                                                                    |
+|-----------------------------------------|--------------------------------------------------------------------------------------------|
+| `jeap-db-schema-publisher-starter`      | Spring Boot auto-configuration; reads the schema on startup and uploads it to the archrepo |
+| `jeap-db-schema-publisher-model-reader` | Reads tables, columns, keys from JDBC `DatabaseMetaData` into a `DatabaseSchema` model     |
 
 ## Changes
 

@@ -30,11 +30,11 @@ spring:
 
 The `token-uri` differs per environment. Examples:
 
-| Environment | `token-uri`                                                                                                       |
-|-------------|------------------------------------------------------------------------------------------------------------------|
+| Environment | `token-uri`                                                                                                     |
+|-------------|-----------------------------------------------------------------------------------------------------------------|
 | dev         | `https://internal-csp.applicationplatform-dev.mycompany.ch/applicationplatform-oauth-mock-service/oauth2/token` |
-| ref / abn   | `https://internal.keycloak-{env}.mycompany.ch/realms/bazg-applicationplatform/protocol/openid-connect/token`   |
-| prod        | `https://internal.keycloak.mycompany.ch/realms/bazg-applicationplatform/protocol/openid-connect/token`        |
+| ref / abn   | `https://internal.keycloak-{env}.mycompany.ch/realms/bazg-applicationplatform/protocol/openid-connect/token`    |
+| prod        | `https://internal.keycloak.mycompany.ch/realms/bazg-applicationplatform/protocol/openid-connect/token`          |
 
 ## Required role
 
