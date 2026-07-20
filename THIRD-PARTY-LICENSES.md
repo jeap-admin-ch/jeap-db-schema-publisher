@@ -118,6 +118,8 @@ Apache License Version 2.0
  * spring-security-oauth2-jose - [org.springframework.security:spring-security-oauth2-jose](https://spring.io/projects/spring-security)
  * spring-security-web - [org.springframework.security:spring-security-web](https://spring.io/projects/spring-security)
  * WireMock - [org.wiremock:wiremock-standalone](http://wiremock.org)
+ * wiremock-spring-boot - [org.wiremock.integrations:wiremock-spring-boot](https://github.com/wiremock/wiremock-spring-boot)
+ * wiremock-spring-boot-standalone - [org.wiremock.integrations:wiremock-spring-boot-standalone](https://github.com/wiremock/wiremock-spring-boot)
  * org.xmlunit:xmlunit-core - [org.xmlunit:xmlunit-core](https://www.xmlunit.org/)
  * SnakeYAML - [org.yaml:snakeyaml](https://bitbucket.org/snakeyaml/snakeyaml)
  * Jackson-core - [tools.jackson.core:jackson-core](https://github.com/FasterXML/jackson-core)
