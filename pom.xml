@@ -43,7 +43,6 @@
 
     <properties>
         <maven.javadoc.skip>false</maven.javadoc.skip>
-        <wiremock-spring-boot.version>4.2.2</wiremock-spring-boot.version>
     </properties>
 
     <dependencyManagement>
@@ -62,12 +61,6 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jeap-db-schema-publisher-starter</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wiremock.integrations</groupId>
-                <artifactId>wiremock-spring-boot-standalone</artifactId>
-                <version>${wiremock-spring-boot.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
