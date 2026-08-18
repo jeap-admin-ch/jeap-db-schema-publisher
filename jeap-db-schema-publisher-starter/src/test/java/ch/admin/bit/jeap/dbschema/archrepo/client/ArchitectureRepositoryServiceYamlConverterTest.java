@@ -2,10 +2,6 @@ package ch.admin.bit.jeap.dbschema.archrepo.client;
 
 import ch.admin.bit.jeap.dbschema.DbSchemaPublisherTestApplication;
 import ch.admin.bit.jeap.dbschema.archrepo.client.ArchitectureRepositoryServiceYamlConverterTest.YamlHttpMessageConverterConfiguration;
-import ch.admin.bit.jeap.dbschema.model.DatabaseSchema;
-import ch.admin.bit.jeap.dbschema.model.Table;
-import ch.admin.bit.jeap.dbschema.model.TableColumn;
-import ch.admin.bit.jeap.dbschema.model.TablePrimaryKey;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,8 +19,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.client.RestClient;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.util.List;
-
+import static ch.admin.bit.jeap.dbschema.archrepo.client.ArchRepoTestFixtures.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,11 +39,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @ActiveProfiles("test")
 class ArchitectureRepositoryServiceYamlConverterTest {
 
-    private static final String API_DBSCHEMAS_PATH = "/api/dbschemas";
-    private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final String APPLICATION_JSON = "application/json";
     private static final String APPLICATION_YAML = "application/yaml";
-    private static final String TEST_APP = "test-app";
 
     static WireMockServer wireMockServer = new WireMockServer(wireMockConfig()
             .dynamicPort()
@@ -83,15 +74,8 @@ class ArchitectureRepositoryServiceYamlConverterTest {
     @BeforeEach
     void setUpStubs() {
         wireMockServer.resetAll();
-        wireMockServer.stubFor(post(urlEqualTo("/oauth/token"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON)
-                        .withBody("{\"access_token\":\"test-token\",\"token_type\":\"Bearer\",\"expires_in\":3600}")));
-        wireMockServer.stubFor(post(urlEqualTo(API_DBSCHEMAS_PATH))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON)));
+        stubOAuthTokenEndpoint(wireMockServer);
+        stubDbSchemasEndpoint(wireMockServer);
     }
 
     @AfterAll
@@ -101,7 +85,7 @@ class ArchitectureRepositoryServiceYamlConverterTest {
 
     @Test
     void publishDbSchema_whenApplicationRegistersYamlConverter_thenSchemaIsPublishedAsJson() {
-        CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(TEST_APP, createTestDatabaseModel());
+        CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(TEST_APP, testDatabaseSchema());
 
         assertThatCode(() -> architectureRepositoryService.publishDbSchema(dto)).doesNotThrowAnyException();
 
@@ -122,10 +106,14 @@ class ArchitectureRepositoryServiceYamlConverterTest {
     /**
      * Control test: proves the YAML converter bean really does take precedence over the JSON converter in the shared
      * {@code RestClient.Builder} of this context. Without it, the test above could pass for the wrong reason.
+     * <p>
+     * It asserts Spring Boot behaviour rather than behaviour of this library. If it fails after a Spring Boot upgrade,
+     * the framework's converter precedence changed - check whether the explicit content type on
+     * {@link ArchitectureRepositoryService#publishDbSchema} is still needed before removing either.
      */
     @Test
     void sharedRestClientBuilder_whenNoContentTypeIsDeclared_thenYamlConverterWins() {
-        CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(TEST_APP, createTestDatabaseModel());
+        CreateOrUpdateDbSchemaDto dto = new CreateOrUpdateDbSchemaDto(TEST_APP, testDatabaseSchema());
 
         restClientBuilder.clone()
                 .baseUrl("http://localhost:" + wireMockServer.port())
@@ -138,14 +126,11 @@ class ArchitectureRepositoryServiceYamlConverterTest {
 
         var requests = wireMockServer.findAll(postRequestedFor(urlEqualTo(API_DBSCHEMAS_PATH)));
         assertThat(requests).hasSize(1);
-        assertThat(requests.getFirst().getHeader(CONTENT_TYPE_HEADER)).startsWith(APPLICATION_YAML);
-    }
-
-    private static DatabaseSchema createTestDatabaseModel() {
-        TableColumn idColumn = new TableColumn("id", "bigint", false);
-        TableColumn nameColumn = new TableColumn("name", "varchar(100)", false);
-        TablePrimaryKey primaryKey = new TablePrimaryKey("users_pk", List.of("id"));
-        Table usersTable = new Table("users", List.of(idColumn, nameColumn), List.of(), primaryKey);
-        return new DatabaseSchema("testdb", "1.0", List.of(usersTable));
+        assertThat(requests.getFirst().getHeader(CONTENT_TYPE_HEADER))
+                .withFailMessage("Expected a host-registered YAML converter to take precedence over the JSON " +
+                        "converter. If this fails after a Spring Boot upgrade, the framework's message converter " +
+                        "precedence changed - verify whether the explicit content type on publishDbSchema is still " +
+                        "required.")
+                .startsWith(APPLICATION_YAML);
     }
 }
