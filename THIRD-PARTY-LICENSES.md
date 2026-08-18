@@ -60,6 +60,7 @@ Apache License Version 2.0
  * Objenesis - [org.objenesis:objenesis](http://objenesis.org/objenesis)
  * org.opentest4j:opentest4j - [org.opentest4j:opentest4j](https://github.com/ota4j-team/opentest4j)
  * JSONassert - [org.skyscreamer:jsonassert](https://github.com/skyscreamer/JSONassert)
+ * SnakeYAML Engine - [org.snakeyaml:snakeyaml-engine](https://bitbucket.org/snakeyaml/snakeyaml-engine)
  * Spring AOP - [org.springframework:spring-aop](https://github.com/spring-projects/spring-framework)
  * Spring Beans - [org.springframework:spring-beans](https://github.com/spring-projects/spring-framework)
  * Spring Context - [org.springframework:spring-context](https://github.com/spring-projects/spring-framework)
@@ -124,6 +125,7 @@ Apache License Version 2.0
  * SnakeYAML - [org.yaml:snakeyaml](https://bitbucket.org/snakeyaml/snakeyaml)
  * Jackson-core - [tools.jackson.core:jackson-core](https://github.com/FasterXML/jackson-core)
  * jackson-databind - [tools.jackson.core:jackson-databind](https://github.com/FasterXML/jackson)
+ * Jackson-dataformat-YAML - [tools.jackson.dataformat:jackson-dataformat-yaml](https://github.com/FasterXML/jackson-dataformats-text)
 
 BSD 2-Clause License
 -------------------------------

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.25.1] - 2026-08-18
+
+### Fixed
+
+- Publish the database schema explicitly as `application/json`. A `HttpMessageConverter` bean registered by the
+  application was added ahead of the default converters and could write the request in another format (e.g. YAML),
+  which archrepo rejected with HTTP 415.
+
 ## [3.25.0] - 2026-08-18
 
 ### Changed

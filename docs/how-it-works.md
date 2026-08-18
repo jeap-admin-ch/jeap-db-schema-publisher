@@ -48,7 +48,9 @@ flowchart LR
 3. `DatabaseModelReader` opens a JDBC connection from the application `DataSource` and reads the schema
    (named by `jeap.archrepo.database.schema-name`, default `data`) from `DatabaseMetaData`.
 4. The result is wrapped in a `CreateOrUpdateDbSchemaDto` (the system component name is
-   `spring.application.name`) and posted to the archrepo at `POST /api/dbschemas`.
+   `spring.application.name`) and posted to the archrepo at `POST /api/dbschemas`. The request declares
+   `Content-Type: application/json` explicitly, so message converters registered by the application cannot
+   change the format of the payload.
 5. The operation is optionally wrapped by `TracingTimer` in a Micrometer span (`publish-db-schema`) and
    timer (`jeap-publish-database-schema`, tagged `status=success|error`) when a `Tracer` and
    `MeterRegistry` are present.
