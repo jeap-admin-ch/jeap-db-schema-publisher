@@ -182,6 +182,7 @@ LGPL-2.1-or-later
 MIT License
 -------------------------------
 
+ * Checker Qual - [org.checkerframework:checker-qual](https://checkerframework.org/)
  * mockito-core - [org.mockito:mockito-core](https://github.com/mockito/mockito)
  * mockito-junit-jupiter - [org.mockito:mockito-junit-jupiter](https://github.com/mockito/mockito)
  * Project Lombok - [org.projectlombok:lombok](https://projectlombok.org)
