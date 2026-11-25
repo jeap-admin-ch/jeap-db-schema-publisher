@@ -122,7 +122,7 @@ Apache License Version 2.0
  * wiremock-spring-boot - [org.wiremock.integrations:wiremock-spring-boot](https://github.com/wiremock/wiremock-spring-boot)
  * wiremock-spring-boot-standalone - [org.wiremock.integrations:wiremock-spring-boot-standalone](https://github.com/wiremock/wiremock-spring-boot)
  * org.xmlunit:xmlunit-core - [org.xmlunit:xmlunit-core](https://www.xmlunit.org/)
- * SnakeYAML - [org.yaml:snakeyaml](https://bitbucket.org/snakeyaml/snakeyaml)
+ * SnakeYAML - [org.yaml:snakeyaml](https://codeberg.org/snakeyaml/snakeyaml)
  * Jackson-core - [tools.jackson.core:jackson-core](https://github.com/FasterXML/jackson-core)
  * jackson-databind - [tools.jackson.core:jackson-databind](https://github.com/FasterXML/jackson)
  * Jackson-dataformat-YAML - [tools.jackson.dataformat:jackson-dataformat-yaml](https://github.com/FasterXML/jackson-dataformats-text)
@@ -198,5 +198,4 @@ MIT License
 Public Domain
 -------------------------------
 
- * AOP alliance - [aopalliance:aopalliance](http://aopalliance.sourceforge.net)
  * HdrHistogram - [org.hdrhistogram:HdrHistogram](http://hdrhistogram.github.io/HdrHistogram/)
